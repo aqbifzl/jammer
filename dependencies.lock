@@ -1,0 +1,19 @@
+dependencies:
+  idf:
+    source:
+      type: idf
+    version: 5.5.1
+  mirf:
+    component_hash: 802646e84e4308d94212942942fcf7882d94a09c14e7d0e812e49be7609aeacd
+    dependencies: []
+    source:
+      git: https://github.com/nopnop2002/esp-idf-mirf.git
+      path: components/mirf
+      type: git
+    version: 41af495a5830c3417d4c889f4e8b25496a445d54
+direct_dependencies:
+- idf
+- mirf
+manifest_hash: 307d34939d39f525d302de6cb082e01225bc1befef85a10a0ccfb6de8f1b251d
+target: esp32
+version: 2.0.0
