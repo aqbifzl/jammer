@@ -11,9 +11,18 @@ dependencies:
       path: components/mirf
       type: git
     version: 41af495a5830c3417d4c889f4e8b25496a445d54
+  ssd1306:
+    component_hash: c118e111d989d2b427ff714bab329405d76deff181bd1bb7356b3b19e74c141b
+    dependencies: []
+    source:
+      git: https://github.com/nopnop2002/esp-idf-ssd1306
+      path: components/ssd1306
+      type: git
+    version: 58881eb222d977d99f120d574b705386078a872e
 direct_dependencies:
 - idf
 - mirf
-manifest_hash: 307d34939d39f525d302de6cb082e01225bc1befef85a10a0ccfb6de8f1b251d
+- ssd1306
+manifest_hash: 8d02a8afed6adcbb3da6e2d745d21ea15cdfd90b36e729edb990421cfe088694
 target: esp32
 version: 2.0.0

@@ -3,3 +3,6 @@ dependencies:
   mirf:
     git: "https://github.com/nopnop2002/esp-idf-mirf.git"
     path: "components/mirf"
+  ssd1306:
+    git: "https://github.com/nopnop2002/esp-idf-ssd1306"
+    path: "components/ssd1306"
