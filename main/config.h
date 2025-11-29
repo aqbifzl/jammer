@@ -10,4 +10,9 @@
 #define UPDATE_INTERVAL_US 1000000
 #define CHANNELS 126
 
+#define TWO_INFO_ROWS (FONT_ROWS * 3)
+#define MARGIN_TOP 5
+#define SPECTRUM_X 0
+#define SPECTRUM_Y (TWO_INFO_ROWS + MARGIN_TOP)
+
 #endif // !CONFIG_H

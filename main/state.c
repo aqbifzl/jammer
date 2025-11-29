@@ -16,6 +16,7 @@ void system_state_init(void) {
   state.highlight_table[0] = &state.selected_ch;
   state.highlight_table[1] = &state.tx_power;
   state.highlight_table[2] = &state.tx_speed;
+  state.highlight_table[3] = &state.jamming;
 
   for (size_t i = 0; i < CHANNELS; i++) {
     state.spectrum_data[i] = false;
@@ -83,7 +84,7 @@ void system_state_on_long_press_repeat(int pin) {
   if (pin == KEY_RIGHT && state.selected_ch < CHANNELS - 1)
     ++state.selected_ch;
 
-  terminal_redraw();
+  terminal_redraw_spectrum();
 }
 
 void system_state_on_short_press(int pin) {
@@ -102,20 +103,29 @@ void system_state_on_short_press(int pin) {
     int max = max_option_sizes[state.highlighted];
     if (state.selected && *state.highlight_table[state.highlighted] < max - 1) {
       *state.highlight_table[state.highlighted] += 1;
-    } else if (state.highlighted < STATE_OPTIONS - 1) {
+    } else if (state.highlighted < OPT_MAX - 1) {
       ++state.highlighted;
     }
 
     break;
   }
-  case KEY_SELECT:
-    state.selected = !state.selected;
-    break;
+  case KEY_SELECT: {
+    if (state.highlighted == OPT_TX_BTN) {
+      *state.highlight_table[OPT_TX_BTN] =
+          !(*state.highlight_table[OPT_TX_BTN]);
+    } else {
+      state.selected = !state.selected;
+    }
+  } break;
   }
 
-  terminal_redraw();
+  terminal_redraw_info();
 }
 
 void system_state_on_long_release(int pin) {
   printf("LONG PRESS END pin=%d\n", pin);
 }
+
+bool system_state_get_jamming(void) { return state.jamming; }
+
+void system_state_set_jamming(bool value) { state.jamming = value; }

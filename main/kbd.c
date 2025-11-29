@@ -11,7 +11,7 @@ typedef enum { BUTTON_EVENT_DOWN, BUTTON_EVENT_UP } button_event_type_t;
 #define QUEUE_LEN 16
 #define LONG_PRESS_US (2 * 1000000)
 #define REPEAT_PERIOD_US 100000
-#define DEBOUNCE_US 5000
+#define DEBOUNCE_US 20000
 
 typedef struct {
   button_event_type_t type;
@@ -63,6 +63,9 @@ void longpress_task(void *arg) {
     int64_t now = esp_timer_get_time();
 
     for (int i = 0; i < KBD_COUNT; ++i) {
+      if (kbd_pins[i] == KEY_SELECT)
+        continue;
+
       button_state_t *st = &btn_state[i];
 
       if (!st->is_down)

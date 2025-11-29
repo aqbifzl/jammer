@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define STATE_OPTIONS 3
+enum { OPT_CHANNEL, OPT_POWER, OPT_SPEED, OPT_TX_BTN, OPT_MAX };
 
 // Set tx power : 0=-18dBm,1=-12dBm,2=-6dBm,3=0dBm
 static const int tx_power_to_dbm[] = {-18, -12, -6, 0};
@@ -17,7 +17,7 @@ static const float tx_speed_to_mbps[] = {1, 2, 0.25};
 static const int tx_speed_to_bw_mhz[] = {1, 2, 1};
 
 static const int max_option_sizes[] = {CHANNELS, COUNT_OF(tx_power_to_dbm),
-                                       COUNT_OF(tx_speed_to_mbps)};
+                                       COUNT_OF(tx_speed_to_mbps), 1};
 
 typedef struct {
   // Selected channel, used for transmission 0-125
@@ -28,9 +28,11 @@ typedef struct {
   int tx_speed;
   // true if there's some activity on channel
   bool spectrum_data[CHANNELS];
-  int *highlight_table[STATE_OPTIONS];
+  int *highlight_table[OPT_MAX];
   int highlighted;
   bool selected;
+  // 0 - false 1 = true
+  int jamming;
 } system_state_t;
 
 void system_state_init(void);
@@ -58,5 +60,8 @@ void system_state_on_long_press_start(int pin);
 void system_state_on_long_press_repeat(int pin);
 void system_state_on_short_press(int pin);
 void system_state_on_long_release(int pin);
+
+bool system_state_get_jamming(void);
+void system_state_set_jamming(bool value);
 
 #endif
