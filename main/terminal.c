@@ -1,7 +1,9 @@
+#include "terminal.h"
 #include "config.h"
 #include "freertos/idf_additions.h"
 #include "ssd1306.h"
 #include "state.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -75,7 +77,7 @@ static void update_scroll_window() {
     scroll_offset = 0;
 }
 
-void draw_spectrum(int x, int y) {
+static void terminal_redraw_spectrum(int x, int y) {
   const int w = DISP_COLS - x;
   const int h = DISP_ROWS - y;
 
@@ -128,15 +130,14 @@ void terminal_init() {
 
   printf("display is %dx%d\n", DISP_ROWS, DISP_COLS);
   ssd1306_init(&disp, DISP_COLS, DISP_ROWS);
-
   ssd1306_contrast(&disp, 0xff);
+
+  terminal_clear();
 }
 
 enum { CHANNEL, POWER, SPEED, BANDWIDTH, MAX };
 
-void redraw() {
-  ssd1306_clear_screen(&disp, false);
-
+static void terminal_redraw_info() {
   char buffers[MAX][MAX_BUF];
   int lengths[MAX];
 
@@ -152,21 +153,6 @@ void redraw() {
   lengths[BANDWIDTH] = snprintf(buffers[BANDWIDTH], MAX_BUF, "B=%dMHz",
                                 tx_speed_to_bw_mhz[tx_speed]);
 
-  // sample
-  // TODO: remove it
-  system_state_set_spectrum_data(0, 1);
-  system_state_set_spectrum_data(1, 0);
-  system_state_set_spectrum_data(2, 1);
-  system_state_set_spectrum_data(3, 1);
-  system_state_set_spectrum_data(124, 1);
-
-  const int TWO_INFO_ROWS = FONT_ROWS * 2;
-  const int MARGIN_TOP = 5;
-  const int start_y = TWO_INFO_ROWS + MARGIN_TOP;
-  draw_spectrum(0, start_y);
-
-  ssd1306_show_buffer(&disp);
-
   const int hl = system_state_get_highlighted();
 
   ssd1306_display_text_box1(&disp, 0, 0, buffers[CHANNEL], lengths[CHANNEL],
@@ -179,4 +165,18 @@ void redraw() {
   ssd1306_display_text_box1(&disp, 1, (lengths[SPEED] + 1) * FONT_COLS,
                             buffers[BANDWIDTH], lengths[BANDWIDTH],
                             lengths[BANDWIDTH], hl == BANDWIDTH, 0);
+}
+
+void terminal_clear() { ssd1306_clear_screen(&disp, false); }
+
+void terminal_redraw() {
+  const int TWO_INFO_ROWS = FONT_ROWS * 3;
+  const int MARGIN_TOP = 5;
+  const int start_y = TWO_INFO_ROWS + MARGIN_TOP;
+
+  terminal_clear();
+  terminal_redraw_info();
+  terminal_redraw_spectrum(0, start_y);
+
+  ssd1306_show_buffer(&disp);
 }

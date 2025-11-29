@@ -2,6 +2,7 @@
 #define TERMINAL_H
 
 void terminal_init();
-void redraw();
+void terminal_redraw();
+void terminal_clear();
 
 #endif // !TERMINAL_H

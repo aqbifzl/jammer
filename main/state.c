@@ -83,7 +83,7 @@ void system_state_on_long_press_repeat(int pin) {
   if (pin == KEY_RIGHT && state.selected_ch < CHANNELS - 1)
     ++state.selected_ch;
 
-  redraw();
+  terminal_redraw();
 }
 
 void system_state_on_short_press(int pin) {
@@ -113,7 +113,7 @@ void system_state_on_short_press(int pin) {
     break;
   }
 
-  redraw();
+  terminal_redraw();
 }
 
 void system_state_on_long_release(int pin) {
