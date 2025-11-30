@@ -15,4 +15,9 @@
 #define SPECTRUM_X 0
 #define SPECTRUM_Y (TWO_INFO_ROWS + MARGIN_TOP)
 
+#define MAX_RF_PAYLOAD 32
+
+#define READY_BIT (1U << 0)
+#define STOPPED_BIT (1U << 1)
+
 #endif // !CONFIG_H

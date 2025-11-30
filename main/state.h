@@ -1,10 +1,14 @@
 #ifndef STATE_H
 #define STATE_H
 #include "config.h"
+#include "mirf.h"
 #include "utils.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/idf_additions.h"
+#include "freertos/task.h"
 
 enum { OPT_CHANNEL, OPT_POWER, OPT_SPEED, OPT_TX_BTN, OPT_MAX };
 

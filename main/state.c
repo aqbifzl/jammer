@@ -1,6 +1,12 @@
 #include "state.h"
 #include "config.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/idf_additions.h"
+#include "freertos/task.h"
+#include "jammer.h"
 #include "kbd.h"
+#include "nrf24_device.h"
+#include "scanner.h"
 #include "terminal.h"
 #include <stdio.h>
 
@@ -12,6 +18,7 @@ void system_state_init(void) {
   state.tx_speed = 0;
   state.highlighted = 0;
   state.selected = false;
+  state.jamming = false;
 
   state.highlight_table[0] = &state.selected_ch;
   state.highlight_table[1] = &state.tx_power;
@@ -110,11 +117,26 @@ void system_state_on_short_press(int pin) {
     break;
   }
   case KEY_SELECT: {
-    if (state.highlighted == OPT_TX_BTN) {
-      *state.highlight_table[OPT_TX_BTN] =
-          !(*state.highlight_table[OPT_TX_BTN]);
-    } else {
+    if (state.highlighted != OPT_TX_BTN) {
       state.selected = !state.selected;
+      break;
+    }
+
+    bool new_jamming_state = !system_state_get_jamming();
+    system_state_set_jamming(new_jamming_state);
+
+    if (new_jamming_state) {
+      scanner_wait_for_stop();
+      jammer_wait_for_stop();
+
+      jammer_init(&nrf24_dev);
+      jammer_wait_for_start();
+    } else {
+      jammer_wait_for_start();
+      jammer_wait_for_stop();
+
+      scanner_init(&nrf24_dev);
+      scanner_wait_for_start();
     }
   } break;
   }
