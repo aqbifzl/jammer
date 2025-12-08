@@ -16,5 +16,6 @@ void bt_loop();
 void all_loop();
 void zigbee_loop();
 void nrf_loop();
+void ble_rand_loop();
 
 #endif // JAMMER_H

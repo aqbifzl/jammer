@@ -1,1 +1,2 @@
-CompileFlags: CompilationDatabase: build/
+CompileFlags:
+  CompilationDatabase: build/release/

@@ -169,6 +169,9 @@ void system_state_on_short_press(int pin) {
         case MODE_BLEA:
           jammer_set_loop(blea_loop);
           break;
+        case MODE_BLE_RAND:
+          jammer_set_loop(ble_rand_loop);
+          break;
         case MODE_BT:
           jammer_set_loop(bt_loop);
           break;

@@ -10,16 +10,16 @@ enum {
   MODE_SINGLE_CHANNEL,
   MODE_BLE,
   MODE_BLEA,
+  MODE_BLE_RAND,
   MODE_BT,
   MODE_ALL,
   MODE_ZIGBEE,
-  MODE_NRF
+  MODE_NRF,
+  MODE_MAX
 };
 
-#define MODES 7
-
-static const char *MODE_STR[MODES] = {"SINGLE", "BLE",    "BLEA", "BT",
-                                      "ALL",    "ZIGBEE", "NRF"};
+static const char *MODE_STR[MODE_MAX] = {"SINGLE", "BLE", "BLEA",   "BLERNG",
+                                         "BT",     "ALL", "ZIGBEE", "NRF"};
 
 // Set tx power : 0=-18dBm,1=-12dBm,2=-6dBm,3=0dBm
 static const int tx_power_to_dbm[] = {-18, -12, -6, 0};
@@ -29,8 +29,9 @@ static const float tx_speed_to_mbps[] = {1, 2, 0.25};
 
 static const int tx_speed_to_bw_mhz[] = {1, 2, 1};
 
-static const int max_option_sizes[] = {
-    MODES, CHANNELS, COUNT_OF(tx_power_to_dbm), COUNT_OF(tx_speed_to_mbps), 1};
+static const int max_option_sizes[] = {MODE_MAX, CHANNELS,
+                                       COUNT_OF(tx_power_to_dbm),
+                                       COUNT_OF(tx_speed_to_mbps), 1};
 typedef struct {
   // Selected channel, used for transmission 0-125
   int selected_ch;

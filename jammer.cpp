@@ -5,6 +5,7 @@
 #include "nrfmods.h"
 #include "sdkconfig.h"
 #include "state.h"
+#include "utils.h"
 #include <Arduino.h>
 #include <RF24.h>
 #include <cstdint>
@@ -72,6 +73,24 @@ void ble_loop() {
   }
 }
 
+constexpr uint32_t MIN_VAL = 0;
+constexpr uint32_t MAX_VAL = COUNT_OF(ble_data_channels);
+constexpr uint32_t RANGE = MAX_VAL - MIN_VAL;
+
+void ble_rand_loop() {
+  uint32_t raw, raw2, r, r2;
+
+  for (int i = 0; i < COUNT_OF(ble_data_channels); ++i) {
+    raw = esp_random();
+    raw2 = esp_random();
+    r = MIN_VAL + (raw % (MAX_VAL - MIN_VAL));
+    r2 = MIN_VAL + (raw2 % (MAX_VAL - MIN_VAL));
+
+    nrf1.setChannel(ble_data_channels[r]);
+    nrf2.setChannel(ble_data_channels[r2]);
+  }
+}
+
 void all_loop() {
   for (int i = 0, j = CHANNELS - 1; i <= i; i += 1, j -= 1) {
     nrf1.setChannel(ble_data_channels[i]);
@@ -99,6 +118,7 @@ void nrf_loop() {
 
 void jammer_loop() {
   if (loop_func) {
+    // Serial.printf("%d %d\n", nrf1.isChipConnected(), nrf2.isChipConnected());
     loop_func();
   }
 }
