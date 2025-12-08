@@ -3,6 +3,7 @@
 #include "RF24.h"
 #include "config.h"
 #include "nrfmods.h"
+#include "sdkconfig.h"
 #include "state.h"
 #include <Arduino.h>
 #include <RF24.h>
@@ -43,10 +44,56 @@ void jammer_stop() {
 
 void jammer_set_loop(jammer_loop_t loop) { loop_func = loop; }
 
-void ble_loop() {
-  for (int i = 1, j = 79; i <= j; i += 2, j -= 2) {
+void bt_loop() {
+  for (int i = 2, j = 78; i <= j; i += 1, j -= 1) {
     nrf1.setChannel(i);
     nrf2.setChannel(j);
+  }
+}
+
+int ble_advertising_channels[] = {2, 26, 80};
+
+void blea_loop() {
+  for (int i = 0, j = COUNT_OF(ble_advertising_channels) - 1; i <= j;
+       i += 1, j -= 1) {
+    nrf1.setChannel(ble_advertising_channels[i]);
+    nrf2.setChannel(ble_advertising_channels[j]);
+  }
+}
+
+const int ble_data_channels[] = {
+    4,  6,  8,  10, 12, 14, 16, 18, 20, 22, 24, 28, 30, 32, 34, 36, 38, 40, 42,
+    44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78};
+
+void ble_loop() {
+  for (int i = 0, j = COUNT_OF(ble_data_channels) - 1; i <= j; i += 1, j -= 1) {
+    nrf1.setChannel(ble_data_channels[i]);
+    nrf2.setChannel(ble_data_channels[j]);
+  }
+}
+
+void all_loop() {
+  for (int i = 0, j = CHANNELS - 1; i <= i; i += 1, j -= 1) {
+    nrf1.setChannel(ble_data_channels[i]);
+    nrf2.setChannel(ble_data_channels[j]);
+  }
+}
+
+const int zigbee_channels[] = {11, 15, 20, 25};
+
+void zigbee_loop() {
+  for (int i = 0, j = COUNT_OF(zigbee_channels) - 1; i <= j; i += 1, j -= 1) {
+    nrf1.setChannel(zigbee_channels[i]);
+    nrf2.setChannel(zigbee_channels[j]);
+  }
+}
+
+const int nrf_channels[] = {76, 78, 79};
+
+void nrf_loop() {
+  for (int i = 0, j = COUNT_OF(nrf_channels) - 1; i <= j; i += 1, j -= 1) {
+    nrf1.setChannel(nrf_channels[i]);
+    nrf2.setChannel(nrf_channels[j]);
   }
 }
 

@@ -6,11 +6,20 @@
 #include <stddef.h>
 
 enum { OPT_MODE, OPT_CHANNEL, OPT_POWER, OPT_SPEED, OPT_TX_BTN, OPT_MAX };
-enum { MODE_SINGLE_CHANNEL, MODE_BLE };
+enum {
+  MODE_SINGLE_CHANNEL,
+  MODE_BLE,
+  MODE_BLEA,
+  MODE_BT,
+  MODE_ALL,
+  MODE_ZIGBEE,
+  MODE_NRF
+};
 
-#define MODES 2
+#define MODES 7
 
-static const char *MODE_STR[MODES] = {"SINGLE", "BLE"};
+static const char *MODE_STR[MODES] = {"SINGLE", "BLE",    "BLEA", "BT",
+                                      "ALL",    "ZIGBEE", "NRF"};
 
 // Set tx power : 0=-18dBm,1=-12dBm,2=-6dBm,3=0dBm
 static const int tx_power_to_dbm[] = {-18, -12, -6, 0};

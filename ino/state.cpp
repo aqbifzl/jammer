@@ -1,6 +1,7 @@
 #include "state.h"
 #include "HardwareSerial.h"
 #include "config.h"
+#include "esp32-hal-bt.h"
 #include "jammer.h"
 #include "kbd.h"
 #include "scanner.h"
@@ -164,6 +165,21 @@ void system_state_on_short_press(int pin) {
           break;
         case MODE_BLE:
           jammer_set_loop(ble_loop);
+          break;
+        case MODE_BLEA:
+          jammer_set_loop(blea_loop);
+          break;
+        case MODE_BT:
+          jammer_set_loop(bt_loop);
+          break;
+        case MODE_ALL:
+          jammer_set_loop(all_loop);
+          break;
+        case MODE_ZIGBEE:
+          jammer_set_loop(zigbee_loop);
+          break;
+        case MODE_NRF:
+          jammer_set_loop(nrf_loop);
           break;
         }
       }
