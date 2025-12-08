@@ -23,5 +23,5 @@ occupies a bandwidth of less than 1MHz at 250kbps and 1Mbps and a bandwidth of l
 2Mbps. nRF24L01+ can operate on frequencies from 2.400GHz to 2.525GHz. The programming resolu-
 tion of the RF channel frequency setting is 1MHz
 
-build (dev):
-./run.sh
+build, upload and monitor:
+make upload-release monitor
