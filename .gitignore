@@ -1,5 +1,3 @@
-idf/build/
-idf/.cache/
 build/
 .cache/
 sdkconfig*
