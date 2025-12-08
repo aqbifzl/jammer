@@ -3,6 +3,7 @@
 #include <SPI.h>
 
 #include "config.h"
+#include "esp32-hal-spi.h"
 #include "nrfmods.h"
 
 SPIClass vspi(NRF1_SPI);

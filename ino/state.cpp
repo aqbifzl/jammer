@@ -12,7 +12,7 @@
 static system_state_t state;
 
 void system_state_init(void) {
-  state.selected_ch = 0;
+  state.selected_ch = DEFAULT_CHANNEL;
   state.tx_power = DEFAULT_POWER;
   state.tx_speed = DEFAULT_SPEED;
   state.highlighted = 0;
