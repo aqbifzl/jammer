@@ -1,22 +1,15 @@
 #include "HardwareSerial.h"
-#include "esp32-hal.h"
-#include "freertos/idf_additions.h"
+#include "config.h"
 #include "jammer.h"
 #include "kbd.h"
 #include "nrfmods.h"
 #include "scanner.h"
+#include "settings_page.h"
 #include "state.h"
 #include "terminal.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <RF24.h>
-#include <SPI.h>
-#include <Wire.h>
-#include <cstring>
-#include <esp_bt.h>
-#include <esp_bt_main.h>
-#include <esp_wifi.h>
-#include <nRF24L01.h>
+#include "tx_page.h"
+#include "wifi_scan_page.h"
+#include <Arduino.h>
 
 void setup() {
   Serial.begin(115200);
@@ -28,32 +21,31 @@ void setup() {
 
   Serial.println("nRF24L01 Channel Scanner and jammer");
 
-  kbd_set_short_press_callback(system_state_on_short_press);
-  kbd_set_long_repeat_callback(system_state_on_long_press_repeat);
-
-  esp_bluedroid_disable();
-  esp_bluedroid_deinit();
-  esp_bt_controller_disable();
-  esp_bt_controller_deinit();
-  esp_bt_mem_release(ESP_BT_MODE_BTDM);
-
-  esp_wifi_stop();
-  esp_wifi_deinit();
-  esp_wifi_disconnect();
+  auto &kbd = Keyboard::instance();
+  kbd.add_button(KEY_LEFT);
+  kbd.add_button(KEY_RIGHT);
+  kbd.add_button(KEY_SELECT);
 
   system_state_init();
-  nrf_init();
   scanner_init();
-  kbd_init();
-  terminal_init();
-  jammer_init();
+
+  Terminal::instance().get_page()->draw();
+  nrf_init();
+  Jammer::instance().init_radios(&nrf1, &nrf2);
+  if (!WiFiPage::instance()->init()) {
+    Serial.println("WiFi initialization failed")
+  }
 }
 
 void loop() {
-  kbd_handle_input();
+  auto &kbd = Keyboard::instance();
 
-  if (system_state_get_jamming())
-    jammer_loop();
-  else
-    scanner_scan();
+  kbd.update();
+
+  InputEvent e;
+  while (kbd.get_ev(&e)) {
+    Terminal::instance().get_page()->handle_input(&e);
+  }
+
+  Jammer::instance().update();
 }

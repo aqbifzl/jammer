@@ -10,4 +10,3 @@ extern RF24 nrf2;
 void nrf_init();
 
 #endif
-

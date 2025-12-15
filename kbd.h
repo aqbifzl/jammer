@@ -1,20 +1,50 @@
 #ifndef KBD_H
 #define KBD_H
 
+#include "config.h"
 #include <Arduino.h>
+#include <cstdint>
+#include <vector>
 
-enum kbd_pins_func {
-  KEY_LEFT = GPIO_NUM_25,
-  KEY_RIGHT = GPIO_NUM_26,
-  KEY_SELECT = GPIO_NUM_27
+enum EventType { EVT_SHORT_PRESS, EVT_LONG_PRESS_START, EVT_LONG_PRESS_HOLD };
+
+struct InputEvent {
+  EventType type;
+  uint8_t pin;
+  uint32_t timestamp;
 };
-typedef void (*kbd_callback_t)(int btn);
-static const int KBD_PINS[] = {KEY_LEFT, KEY_RIGHT, KEY_SELECT};
-#define KBD_COUNT (sizeof(KBD_PINS) / sizeof(KBD_PINS[0]))
 
-void kbd_init();
-void kbd_handle_input();
-void kbd_set_short_press_callback(kbd_callback_t cb);
-void kbd_set_long_repeat_callback(kbd_callback_t cb);
+class Keyboard {
+private:
+  struct ButtonState {
+    uint8_t pin;
+    bool pressed;
+    bool long_pressed;
+    uint64_t last_repeat;
+
+    volatile bool debouncing;
+    volatile uint64_t debouncing_start_time;
+  };
+
+  volatile InputEvent eventQueue[EVENT_QUEUE_SIZE];
+  volatile uint8_t head = 0;
+  volatile uint8_t tail = 0;
+
+  std::vector<ButtonState *> buttons;
+  portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+
+  static void IRAM_ATTR isrHandler(void *arg);
+  void push_to_queue(InputEvent evt);
+
+public:
+  static Keyboard &instance() {
+    static Keyboard s;
+    return s;
+  }
+
+  void add_button(uint8_t pin);
+  void update();
+  bool get_ev(InputEvent *ev);
+};
 
 #endif // !KBD_H

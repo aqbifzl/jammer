@@ -4,6 +4,7 @@
 #include "nrfmods.h"
 #include "state.h"
 #include "terminal.h"
+#include <Arduino.h>
 #include <cstring>
 #include <stdbool.h>
 
@@ -49,6 +50,5 @@ void scanner_scan() {
 
   if (system_state_spectrum_changed(new_activity_state)) {
     system_state_set_spectrum_data_all(new_activity_state, CHANNELS);
-    terminal_redraw_spectrum();
   }
 }

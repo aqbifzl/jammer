@@ -14,15 +14,15 @@
 #define NRF1_MISO 19
 #define NRF1_MOSI 23
 #define NRF1_SCK 18
-#define NRF1_CS 16
-#define NRF1_CSN 17
+#define NRF1_CE 21
+#define NRF1_CSN 22
 // nrf2 is connected to hspi
 #define NRF2_MISO 12
 #define NRF2_MOSI 13
 #define NRF2_SCK 14
 #define NRF2_SPI HSPI
-#define NRF2_CS 4
-#define NRF2_CSN 2
+#define NRF2_CE 27
+#define NRF2_CSN 26
 
 // spectrum
 #define INFO_ROWS (FONT_ROWS * 4)
@@ -31,18 +31,23 @@
 #define SPECTRUM_Y (INFO_ROWS + MARGIN_TOP)
 
 // display
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
+#define DISP_COLS 128
+#define DISP_ROWS 64
 
 #define I2C_ADDRESS_1 0x3C
 #define I2C_ADDRESS_2 0x3D
 
-#define I2C_SDA_PIN 21
-#define I2C_SCL_PIN 22
+#define I2C_SDA_PIN 17
+#define I2C_SCL_PIN 5
 
 // keyboard
-#define LONG_PRESS_START_MS 1000UL
-#define LONG_PRESS_REPEAT_MS 100UL
-#define DEBOUNCE_MS 40UL
+#define EVENT_QUEUE_SIZE 32
+#define LONG_PRESS_START_MS 600
+#define LONG_PRESS_REPEAT_MS 200
+#define DEBOUNCE_MS 25
+
+#define KEY_LEFT 32
+#define KEY_RIGHT 33
+#define KEY_SELECT 25
 
 #endif // !CONFIG_H

@@ -1,106 +1,103 @@
 #include "kbd.h"
-#include "HardwareSerial.h"
 #include "config.h"
 #include "esp32-hal-gpio.h"
-#include <Arduino.h>
+#include "esp32-hal.h"
 
-volatile bool irq_flags[KBD_COUNT] = {false};
+void IRAM_ATTR Keyboard::isrHandler(void *arg) {
+  ButtonState *btn = static_cast<ButtonState *>(arg);
 
-static bool pressed[KBD_COUNT] = {false};
-static bool long_started[KBD_COUNT] = {false};
-static unsigned long press_start[KBD_COUNT] = {0};
-static unsigned long last_change[KBD_COUNT] = {0};
-static unsigned long last_repeat_time[KBD_COUNT] = {0};
+  detachInterrupt(btn->pin);
 
-static kbd_callback_t short_cb = nullptr;
-static kbd_callback_t long_repeat_cb = nullptr;
+  btn->debouncing = true;
+  btn->debouncing_start_time = millis();
+}
 
-// ISR for each button
-void IRAM_ATTR handle_button0() { irq_flags[0] = true; }
-void IRAM_ATTR handle_button1() { irq_flags[1] = true; }
-void IRAM_ATTR handle_button2() { irq_flags[2] = true; }
-
-typedef void (*ButtonISR)();
-ButtonISR isrs[KBD_COUNT] = {handle_button0, handle_button1, handle_button2};
-
-void kbd_init() {
-  for (uint8_t i = 0; i < KBD_COUNT; i++) {
-    pinMode(KBD_PINS[i], INPUT_PULLDOWN);
-    attachInterrupt(KBD_PINS[i], isrs[i], CHANGE);
-    irq_flags[i] = false;
-    pressed[i] = false;
-    long_started[i] = false;
-    press_start[i] = 0;
-    last_change[i] = 0;
-    last_repeat_time[i] = 0;
+void Keyboard::push_to_queue(InputEvent evt) {
+  uint8_t nextHead = (head + 1) % EVENT_QUEUE_SIZE;
+  if (nextHead != tail) {
+    eventQueue[head].type = evt.type;
+    eventQueue[head].pin = evt.pin;
+    eventQueue[head].timestamp = evt.timestamp;
+    head = nextHead;
   }
 }
 
-void kbd_handle_input() {
+void Keyboard::add_button(uint8_t pin) {
+  pinMode(pin, INPUT_PULLUP);
+  bool pressed_now = !digitalRead(pin);
+
+  ButtonState *btn = new ButtonState{pin, pressed_now, false, 0, false, 0};
+  buttons.push_back(btn);
+
+  attachInterruptArg(digitalPinToInterrupt(pin), isrHandler, btn, CHANGE);
+}
+
+void Keyboard::update() {
   unsigned long now = millis();
 
-  for (uint8_t i = 0; i < KBD_COUNT; ++i) {
-    if (!irq_flags[i])
-      continue;
-    irq_flags[i] = false;
+  for (auto btn : buttons) {
+    if (btn->debouncing) {
+      if (now - btn->debouncing_start_time >= DEBOUNCE_MS) {
+        bool state = !digitalRead(btn->pin); // pull-up
 
-    bool level = digitalRead(KBD_PINS[i]);
+        if (state != btn->pressed) {
+          btn->pressed = state;
 
-    // debouncing
-    if (now - last_change[i] < DEBOUNCE_MS) {
-      continue;
-    }
-
-    last_change[i] = now;
-
-    if (level == HIGH) {
-      // pressed
-      pressed[i] = true;
-      long_started[i] = false;
-      press_start[i] = now;
-      last_repeat_time[i] = 0;
-    } else {
-      // released
-      if (pressed[i]) {
-        if (!long_started[i]) {
-          if (short_cb) {
-            short_cb(KBD_PINS[i]);
+          if (state) {
+            btn->long_pressed = false;
+            btn->last_repeat = now;
+          } else {
+            if (!btn->long_pressed) {
+              portENTER_CRITICAL(&mux);
+              push_to_queue({EVT_SHORT_PRESS, btn->pin, (uint32_t)now});
+              portEXIT_CRITICAL(&mux);
+            }
+            btn->long_pressed = false;
           }
-        } else {
-          // you can handle long press release here
         }
+
+        btn->debouncing = false;
+        attachInterruptArg(digitalPinToInterrupt(btn->pin), isrHandler, btn,
+                           CHANGE);
       }
-      // reset button state
-      pressed[i] = false;
-      long_started[i] = false;
-      press_start[i] = 0;
-      last_repeat_time[i] = 0;
     }
-  }
 
-  for (uint8_t i = 0; i < KBD_COUNT; ++i) {
-    if (!pressed[i])
-      continue;
+    if (btn->pressed && !btn->debouncing) {
 
-    unsigned long held = now - press_start[i];
+      unsigned long duration = now - btn->debouncing_start_time;
 
-    if (!long_started[i]) {
-      if (held >= LONG_PRESS_START_MS) {
-        long_started[i] = true;
-        last_repeat_time[i] = now;
-        // you can handle long press start here
+      if (!btn->long_pressed && duration >= LONG_PRESS_START_MS) {
+        btn->long_pressed = true;
+        btn->last_repeat = now;
+
+        portENTER_CRITICAL(&mux);
+        push_to_queue({EVT_LONG_PRESS_START, btn->pin, (uint32_t)now});
+        portEXIT_CRITICAL(&mux);
       }
-    } else {
-      if (now - last_repeat_time[i] >= LONG_PRESS_REPEAT_MS) {
-        last_repeat_time[i] = now;
 
-        if (long_repeat_cb)
-          long_repeat_cb(KBD_PINS[i]);
+      if (btn->long_pressed &&
+          (now - btn->last_repeat >= LONG_PRESS_REPEAT_MS)) {
+        btn->last_repeat = now;
+
+        portENTER_CRITICAL(&mux);
+        push_to_queue({EVT_LONG_PRESS_HOLD, btn->pin, (uint32_t)now});
+        portEXIT_CRITICAL(&mux);
       }
     }
   }
 }
 
-void kbd_set_short_press_callback(kbd_callback_t cb) { short_cb = cb; }
+bool Keyboard::get_ev(InputEvent *ev) {
+  if (head == tail)
+    return false;
 
-void kbd_set_long_repeat_callback(kbd_callback_t cb) { long_repeat_cb = cb; }
+  portENTER_CRITICAL(&mux);
+  ev->type = eventQueue[tail].type;
+  ev->pin = eventQueue[tail].pin;
+  ev->timestamp = eventQueue[tail].timestamp;
+
+  tail = (tail + 1) % EVENT_QUEUE_SIZE;
+  portEXIT_CRITICAL(&mux);
+
+  return true;
+}
