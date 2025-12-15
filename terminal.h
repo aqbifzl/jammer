@@ -4,14 +4,18 @@
 #include "kbd.h"
 #include "page.h"
 #include <Adafruit_SSD1306.h>
+#include <cstdint>
+
+enum class PageID : uint8_t { TX = 0, SETTINGS, WIFI_SCAN, MAX };
 
 class Terminal {
 private:
-  int _current_page;
+  Page *pages[(int)PageID::MAX];
+  PageID current_page;
+
   int font_cols, font_rows;
   Adafruit_SSD1306 display;
   Terminal();
-  static const std::vector<Page *> pages;
 
 public:
   static Terminal &instance() {
@@ -28,6 +32,7 @@ public:
   Page *get_page() const;
   void next_page();
   void prev_page();
+  void switch_page(PageID page);
 };
 
 void draw_text_field(int16_t x, int16_t y, const char *text, bool highlight);

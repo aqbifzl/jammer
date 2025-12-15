@@ -32,9 +32,6 @@ void setup() {
   Terminal::instance().get_page()->draw();
   nrf_init();
   Jammer::instance().init_radios(&nrf1, &nrf2);
-  if (!WiFiPage::instance()->init()) {
-    Serial.println("WiFi initialization failed")
-  }
 }
 
 void loop() {
@@ -47,5 +44,5 @@ void loop() {
     Terminal::instance().get_page()->handle_input(&e);
   }
 
-  Jammer::instance().update();
+  Terminal::instance().get_page()->update();
 }

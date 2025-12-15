@@ -8,6 +8,7 @@ public:
   virtual ~Page() {}
   virtual void on_enter() {}
   virtual void on_exit() {}
+  virtual void update() {};
 
   virtual void handle_input(InputEvent *ev) = 0;
   virtual void draw() = 0;

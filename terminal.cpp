@@ -14,23 +14,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-const std::vector<Page *> Terminal::pages = {
-    TXPage::instance(), SettingsPage::instance(), WifiPage::instance()};
-
-void Terminal::next_page() {
-  _current_page = (_current_page + 1) % pages.size();
-}
-
-void Terminal::prev_page() {
-  int prev_index = _current_page - 1;
-
-  if (prev_index < 0) {
-    prev_index = pages.size() - 1;
-  }
-
-  _current_page = prev_index;
-}
-
 Terminal::Terminal() {
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
   Wire.setClock(100000);
@@ -46,6 +29,11 @@ Terminal::Terminal() {
         ;
     }
   }
+
+  pages[(int)PageID::TX] = TXPage::instance();
+  pages[(int)PageID::SETTINGS] = SettingsPage::instance();
+  pages[(int)PageID::WIFI_SCAN] = WiFiPage::instance();
+  current_page = PageID::TX;
 
   display.clearDisplay();
   display.setTextSize(1);
@@ -85,6 +73,41 @@ void draw_text_field(int16_t x, int16_t y, const char *text, bool highlight) {
   display->setTextColor(SSD1306_WHITE);
 }
 
-Page *Terminal::get_page() const { return pages[_current_page]; }
+Page *Terminal::get_page() const { return pages[(int)current_page]; }
 
 Adafruit_SSD1306 *Terminal::get_display() { return &display; }
+
+void Terminal::switch_page(PageID page) {
+  int id_idx = (int)page;
+  int current_idx = (int)current_page;
+
+  if (page == current_page)
+    return;
+  if (id_idx < 0 || id_idx >= (int)PageID::MAX)
+    return;
+
+  if (pages[current_idx]) {
+    pages[current_idx]->on_exit();
+  }
+
+  current_page = page;
+
+  display.clearDisplay();
+
+  if (pages[id_idx]) {
+    pages[id_idx]->on_enter();
+  }
+}
+
+void Terminal::next_page() {
+  int next_idx = ((int)current_page + 1) % (int)PageID::MAX;
+  switch_page((PageID)next_idx);
+}
+
+void Terminal::prev_page() {
+  int prev_idx = (int)current_page - 1;
+  if (prev_idx < 0) {
+    prev_idx = (int)PageID::MAX - 1;
+  }
+  switch_page((PageID)prev_idx);
+}

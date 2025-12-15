@@ -15,9 +15,9 @@ void IRAM_ATTR Keyboard::isrHandler(void *arg) {
 void Keyboard::push_to_queue(InputEvent evt) {
   uint8_t nextHead = (head + 1) % EVENT_QUEUE_SIZE;
   if (nextHead != tail) {
-    eventQueue[head].type = evt.type;
-    eventQueue[head].pin = evt.pin;
-    eventQueue[head].timestamp = evt.timestamp;
+    event_queue[head].type = evt.type;
+    event_queue[head].pin = evt.pin;
+    event_queue[head].timestamp = evt.timestamp;
     head = nextHead;
   }
 }
@@ -92,9 +92,9 @@ bool Keyboard::get_ev(InputEvent *ev) {
     return false;
 
   portENTER_CRITICAL(&mux);
-  ev->type = eventQueue[tail].type;
-  ev->pin = eventQueue[tail].pin;
-  ev->timestamp = eventQueue[tail].timestamp;
+  ev->type = event_queue[tail].type;
+  ev->pin = event_queue[tail].pin;
+  ev->timestamp = event_queue[tail].timestamp;
 
   tail = (tail + 1) % EVENT_QUEUE_SIZE;
   portEXIT_CRITICAL(&mux);

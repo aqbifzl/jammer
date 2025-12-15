@@ -23,6 +23,7 @@ public:
   }
   void draw() override;
   void handle_input(InputEvent *ev) override;
+  void update() override;
 };
 
 #endif

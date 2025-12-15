@@ -20,16 +20,15 @@ struct MenuOption {
 // true when page is changed
 static bool handle_page_change(InputEvent *ev) {
   if (ev->type == EVT_LONG_PRESS_START) {
-    if (ev->pin == KEY_LEFT) {
-      Terminal::instance().prev_page();
-      return true;
-    }
-    if (ev->pin == KEY_RIGHT) {
-      Terminal::instance().next_page();
-      return true;
-    }
+    if (ev->pin == KEY_SELECT)
+      return false;
 
-    return false;
+    if (ev->pin == KEY_LEFT)
+      Terminal::instance().prev_page();
+    if (ev->pin == KEY_RIGHT)
+      Terminal::instance().next_page();
+
+    return true;
   }
 
   return false;

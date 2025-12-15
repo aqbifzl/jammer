@@ -73,3 +73,5 @@ void TXPage::handle_input(InputEvent *ev) {
 
   draw();
 }
+
+void TXPage::update() { Jammer::instance().update(); }

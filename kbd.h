@@ -6,7 +6,11 @@
 #include <cstdint>
 #include <vector>
 
-enum EventType { EVT_SHORT_PRESS, EVT_LONG_PRESS_START, EVT_LONG_PRESS_HOLD };
+enum EventType {
+  EVT_SHORT_PRESS = 0,
+  EVT_LONG_PRESS_START,
+  EVT_LONG_PRESS_HOLD
+};
 
 struct InputEvent {
   EventType type;
@@ -26,7 +30,7 @@ private:
     volatile uint64_t debouncing_start_time;
   };
 
-  volatile InputEvent eventQueue[EVENT_QUEUE_SIZE];
+  volatile InputEvent event_queue[EVENT_QUEUE_SIZE];
   volatile uint8_t head = 0;
   volatile uint8_t tail = 0;
 
