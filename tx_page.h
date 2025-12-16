@@ -13,6 +13,7 @@ private:
   std::vector<MenuOption> options;
 
   TXPage();
+  void build_options();
   int get_highlighted_value();
   void set_highlighted_value(int val);
 

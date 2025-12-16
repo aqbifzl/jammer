@@ -26,7 +26,6 @@ void setup() {
   kbd.add_button(KEY_RIGHT);
   kbd.add_button(KEY_SELECT);
 
-  system_state_init();
   scanner_init();
 
   Terminal::instance().get_page()->draw();

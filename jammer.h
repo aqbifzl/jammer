@@ -23,16 +23,20 @@ private:
 
   Jammer();
 
+  inline void set_channels(int ch1, int ch2);
+  void run_range(int start, int end, int step = 1);
+  void run_list(const int *list, size_t size);
   void setup_radio(RF24 *radio, uint8_t ch);
 
   void loop_ble();
   void loop_blea();
   void loop_bt();
   void loop_all();
-  void loop_zigbee();
+  // void loop_zigbee();
   void loop_nrf();
   void loop_ble_rand();
   void loop_wifi();
+  void loop_range();
 
 public:
   static Jammer &instance() {

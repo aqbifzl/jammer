@@ -48,7 +48,8 @@ void scanner_scan() {
     new_activity_state[ch] = nrf1.testRPD();
   }
 
-  if (system_state_spectrum_changed(new_activity_state)) {
-    system_state_set_spectrum_data_all(new_activity_state, CHANNELS);
+  if (SystemState::instance().scanner.spectrum_changed(new_activity_state)) {
+    SystemState::instance().scanner.set_spectrum_data_all(new_activity_state,
+                                                          CHANNELS);
   }
 }

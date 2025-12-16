@@ -5,26 +5,28 @@
 #include "kbd.h"
 #include "state.h"
 #include "terminal.h"
+#include "utils.h"
 #include <Adafruit_SSD1306.h>
 #include <Arduino.h>
 
 SettingsPage::SettingsPage() {
-  highlighted = 0;
-  selected = false;
-
-  options.push_back({"TX POWER", 0, COUNT_OF(tx_power_to_dbm) - 1,
-                     []() { return system_state_get_tx_power(); },
-                     [](int v) { system_state_set_tx_power(v); },
+  options.push_back({"TX POWER", 0,
+                     COUNT_OF(GlobalSettings::tx_power_to_dbm) - 1,
+                     []() { return SystemState::instance().global.tx_power; },
+                     [](int v) { SystemState::instance().global.tx_power = v; },
                      [](char *buf, int v) {
-                       snprintf(buf, 32, "TX POWER: %ddBm", tx_power_to_dbm[v]);
+                       snprintf(buf, 32, "TX POWER: %ddBm",
+                                GlobalSettings::tx_power_to_dbm[v]);
                      }});
 
-  options.push_back({"SPEED", 0, COUNT_OF(tx_speed_to_bw_mhz) - 1,
-                     []() { return system_state_get_tx_speed(); },
-                     [](int v) { system_state_set_tx_speed(v); },
+  options.push_back({"SPEED", 0,
+                     COUNT_OF(GlobalSettings::tx_speed_to_bw_mhz) - 1,
+                     []() { return SystemState::instance().global.tx_speed; },
+                     [](int v) { SystemState::instance().global.tx_speed = v; },
                      [](char *buf, int v) {
                        snprintf(buf, 32, "SPEED=%.2fMbps(%dMHz)",
-                                tx_speed_to_mbps[v], tx_speed_to_bw_mhz[v]);
+                                GlobalSettings::tx_speed_to_mbps[v],
+                                GlobalSettings::tx_speed_to_bw_mhz[v]);
                      }});
 }
 

@@ -8,8 +8,8 @@
 class SettingsPage : public Page {
 private:
   std::vector<MenuOption> options;
-  int highlighted;
-  bool selected;
+  int highlighted = 0;
+  bool selected = false;
   SettingsPage();
 
 public:
