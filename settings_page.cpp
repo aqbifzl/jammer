@@ -6,7 +6,6 @@
 #include "state.h"
 #include "terminal.h"
 #include "utils.h"
-#include <Adafruit_SSD1306.h>
 #include <Arduino.h>
 
 SettingsPage::SettingsPage() {

@@ -6,6 +6,9 @@
 #define DEFAULT_CHANNEL 45
 #define DEFAULT_SPEED 1
 
+#define GAP 1
+#define SPIKE_W 2
+
 // nrf24l01
 #define CHANNELS 126
 
@@ -25,10 +28,10 @@
 #define NRF2_CSN 26
 
 // spectrum
-#define INFO_ROWS (FONT_ROWS * 4)
-#define MARGIN_TOP 5
 #define SPECTRUM_X 0
-#define SPECTRUM_Y (INFO_ROWS + MARGIN_TOP)
+#define SPECTRUM_Y (DISP_ROWS - SPECTRUM_H)
+#define SPECTRUM_W DISP_COLS
+#define SPECTRUM_H 18
 
 // display
 #define DISP_COLS 128

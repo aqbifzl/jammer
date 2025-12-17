@@ -6,7 +6,6 @@
 #include "kbd.h"
 #include "state.h"
 #include "terminal.h"
-#include <Adafruit_SSD1306.h>
 #include <Arduino.h>
 #include <cstring>
 

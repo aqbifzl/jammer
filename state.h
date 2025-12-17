@@ -32,22 +32,10 @@ struct TxPageSettings {
   int range_step = 1;
 };
 
-struct ScannerSettings {
-private:
-  bool spectrum_data[CHANNELS] = {0};
-
-public:
-  bool get_spectrum_data(size_t index);
-  void set_spectrum_data(size_t index, bool value);
-  void set_spectrum_data_all(const bool *data, size_t len);
-  bool spectrum_changed(bool *b);
-};
-
 class SystemState {
 public:
   GlobalSettings global;
   TxPageSettings tx_page;
-  ScannerSettings scanner;
 
   static SystemState &instance() {
     static SystemState ss;

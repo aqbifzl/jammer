@@ -3,10 +3,11 @@
 
 #include "kbd.h"
 #include "page.h"
+#define SSD1306_NO_SPLASH
 #include <Adafruit_SSD1306.h>
 #include <cstdint>
 
-enum class PageID : uint8_t { TX = 0, SETTINGS, WIFI_SCAN, MAX };
+enum class PageID : uint8_t { TX = 0, SCAN, SETTINGS, WIFI_SCAN, MAX };
 
 class Terminal {
 private:
@@ -24,6 +25,7 @@ public:
   }
   int get_font_cols() { return font_cols; }
   int get_font_rows() { return font_rows; }
+  void show_animation();
 
   Terminal(const Terminal &) = delete;
   Terminal &operator=(const Terminal &) = delete;

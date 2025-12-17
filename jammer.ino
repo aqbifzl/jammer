@@ -3,7 +3,7 @@
 #include "jammer.h"
 #include "kbd.h"
 #include "nrfmods.h"
-#include "scanner.h"
+#include "scanner_page.h"
 #include "settings_page.h"
 #include "state.h"
 #include "terminal.h"
@@ -13,12 +13,6 @@
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) {
-    // wait for serial port to connect
-  }
-
-  delay(3000);
-
   Serial.println("nRF24L01 Channel Scanner and jammer");
 
   auto &kbd = Keyboard::instance();
@@ -26,11 +20,11 @@ void setup() {
   kbd.add_button(KEY_RIGHT);
   kbd.add_button(KEY_SELECT);
 
-  scanner_init();
-
-  Terminal::instance().get_page()->draw();
   nrf_init();
+  ScannerPage::instance()->init(&nrf1);
   Jammer::instance().init_radios(&nrf1, &nrf2);
+  Terminal::instance().show_animation();
+  Terminal::instance().get_page()->draw();
 }
 
 void loop() {

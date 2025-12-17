@@ -29,8 +29,6 @@ private:
   TaskHandle_t scan_task_handle = nullptr;
   SemaphoreHandle_t data_mutex = nullptr;
 
-  void truncate_ssid_buffer(const char *source, char *dest, int max_len);
-  void scan_networks();
   static void scan_task_entry(void *pvParameters);
   void scan_task_loop();
 

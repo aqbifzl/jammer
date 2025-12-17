@@ -4,8 +4,8 @@
 #include "esp_err.h"
 #include "esp_wifi_types_generic.h"
 #include "freertos/idf_additions.h"
+#include "scanner_page.h"
 #include "terminal.h"
-#include <Adafruit_SSD1306.h>
 #include <Arduino.h>
 #include <cstdio>
 #include <cstring>
